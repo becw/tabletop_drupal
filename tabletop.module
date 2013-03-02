@@ -137,7 +137,12 @@ function tabletop_field_widget_form(&$form, &$form_state, $field, $instance, $la
       '#format' => $value['format'],
       '#attributes' => array('class' => array('tabletop-template')),
       '#required' => $instance['required'],
-      '#prefix' => '<div class="tabletop-model-columns">To get started, try <code>{{#each data}}</code>.</div>',
+      '#prefix' => '<div class="tabletop-model-help"><div>'
+        . t('Display your data in a template using !handlebars syntax; to get started, try !each.', array(
+          '!handlebars' => l('Handlebars', 'http://handlebarsjs.com/'),
+          '!each' => l('<code>{{#each data}}</code>', 'http://handlebarsjs.com/#iteration', array('html' => TRUE)),
+        ))
+        . '</div><div class="tabletop-model-columns"></div></div>',
     );
   }
 

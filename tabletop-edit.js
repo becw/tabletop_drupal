@@ -5,21 +5,24 @@
     attach: function(context, settings) {
       $('.edit-tabletop').each(function(i, field) {
         // Replace the 'sheet' text field with a select widget.
-        var select = $('<select class="form-select"><option value="">Choose a sheet</option></select>')
+        var select = $('<select class="form-select"></select>')
           .change({ 'field': field }, Drupal.behaviors.tabletopEdit.changeSelect);
         $('.tabletop-sheet', field).after(select);
 
         // Instantiate Tabletop objects.
         $('input.tabletop-key', field).change(function(e) {
+          // Empty the sheet select widget.
+          $(select).empty();
+
+          // Empty the dynamic template help.
+          $('.tabletop-model-columns', field).empty();
+
           if (e.target.value) {
             var table = Tabletop.init({
               key: e.target.value,
               callback: function() {
                 var table = $(field).data('table');
                 if (table) {
-                  // Empty the sheet select widget.
-                  $(select).empty();
-
                   // Build new options with sheets from the updated table.
                   $.each(table.model_names, function(i, name) {
                     $(select).append('<option value="' + name + '">' + name + '</option>');
@@ -47,7 +50,10 @@
     changeSelect: function(e) {
       var field = $(e.data.field);
       var selected = e.target.value;
-      $('.tabletop-sheet', field).val(selected);
+
+      if (selected) {
+        $('.tabletop-sheet', field).val(selected);
+      }
 
       var table = $(field).data('table');
 
