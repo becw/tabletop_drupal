@@ -1,7 +1,7 @@
 (function ($) {
   Drupal.tabletop = [];
   Drupal.behaviors.tabletopEdit = {
-    
+
     attach: function(context, settings) {
       $('.edit-tabletop').each(function(i, field) {
         // Replace the 'sheet' text field with a select widget.
@@ -18,18 +18,16 @@
                 var table = $(field).data('table');
                 if (table) {
                   // Empty the sheet select widget.
-                  var select = $('.tabletop-sheet-select select', field).empty();
-                  // Add sheets from the updated table.
+                  $(select).empty();
+
+                  // Build new options with sheets from the updated table.
                   $.each(table.model_names, function(i, name) {
-                    var option = '<option value="' + name + '">' + name + '</option>';
-                    // If the current sheet name matches this sheet, select it.
-                    // @todo actually test this.
-                    if (name == $('.tabletop-sheet', field).val()) {
-                      $(option).attr('selected', 'selected');
-                    }
-                    // Add the sheet option.
-                    $(select).append(option);
+                    $(select).append('<option value="' + name + '">' + name + '</option>');
                   });
+
+                  // If there's a sheet that matches the current sheet name, select it.
+                  var sheetName = $('.tabletop-sheet', field).val();
+                  $('option[value="' + sheetName + '"]').attr('selected', 'selected');
 
                   // Trigger the change event on the select widget so that column names update
                   $(select).change();
@@ -71,7 +69,7 @@
             newDefaultValue += "\r\n  {{" + col + "}}";
           });
           newDefaultValue += "\r\n{{/each}}";
-          
+
           // Set default.
           if (!$template.val() || $template.val() == defaultValue) {
             $template.val(newDefaultValue);
