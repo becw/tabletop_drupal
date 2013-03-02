@@ -5,9 +5,9 @@
     attach: function(context, settings) {
       $('.edit-tabletop').each(function(i, field) {
         // Replace the 'sheet' text field with a select widget.
-        var select = $('<select><option value="">Choose a sheet</option></select>')
+        var select = $('<select class="form-select"><option value="">Choose a sheet</option></select>')
           .change({ 'field': field }, Drupal.behaviors.tabletopEdit.changeSelect);
-        $('.tabletop-sheet-select', field).append(select);
+        $('.tabletop-sheet', field).after(select);
 
         // Instantiate Tabletop objects.
         $('input.tabletop-key', field).change(function(e) {

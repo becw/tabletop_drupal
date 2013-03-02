@@ -126,7 +126,6 @@ function tabletop_field_widget_form(&$form, &$form_state, $field, $instance, $la
       '#default_value' => $value['sheet'],
       '#attributes' => array('class' => array('tabletop-sheet', 'js-hide')),
       '#required' => $instance['required'],
-      '#suffix' => '<div class="tabletop-sheet-select"></div>',
     );
     $element['template'] = array(
       '#type' => 'text_format',
