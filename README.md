@@ -15,7 +15,7 @@ To use this module:
 
 **THIS MODULE HAS SEVERAL SECURITY ISSUES. It's currently a proof-of-concept and has many bugs on top of its security issues.**
 
-Installing Tabletop and Handlebar.js libraries in Drupal
+Installing Tabletop and Handlebars.js libraries in Drupal
 --
 
 Download the libraries:
