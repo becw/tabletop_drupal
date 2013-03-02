@@ -126,15 +126,16 @@ function tabletop_field_widget_form(&$form, &$form_state, $field, $instance, $la
       '#default_value' => $value['sheet'],
       '#attributes' => array('class' => array('tabletop-sheet', 'js-hide')),
       '#required' => $instance['required'],
-      '#prefix' => '<div class="tabletop-sheet-select"></div>',
+      '#suffix' => '<div class="tabletop-sheet-select"></div>',
     );
     $element['template'] = array(
-      '#type' => 'textarea',
+      '#type' => 'text_format',
       '#title' => t('Template'),
       '#description' => t('A !handlebars template for your data.', array(
         '!handlebars' => l('Handlebars', 'http://handlebarsjs.com/'),
       )),
       '#default_value' => $value['template'],
+      '#format' => $value['format'],
       '#attributes' => array('class' => array('tabletop-template')),
       '#required' => $instance['required'],
       '#prefix' => '<div class="tabletop-model-columns">To get started, try <code>{{#each data}}</code>.</div>',
@@ -148,11 +149,14 @@ function tabletop_field_widget_form(&$form, &$form_state, $field, $instance, $la
  * Field validation.
  */
 function tabletop_tabletop_widget_validate($element, &$form_state) {
-  // $delta = $element['#delta'];
-  // $field = $form_state['field'][$element['#field_name']][$element['#language']]['field'];
-  // $field_name = $field['field_name'];
-  // $value = isset($form_state['values'][$field_name][$element['#language']][$delta]) ? $form_state['values'][$field_name][$element['#language']][$delta] : NULL;
-  // form_error($element['key'], t('Something is wrong.'));
+  $delta = $element['#delta'];
+  $field_name = $form_state['field'][$element['#field_name']][$element['#language']]['field']['field_name'];
+  $value = isset($form_state['values'][$field_name][$element['#language']][$delta]) ? $form_state['values'][$field_name][$element['#language']][$delta] : NULL;
+
+  // Rearrange the template fields from the widget.
+  $value['format'] = $value['template']['format'];
+  $value['template'] = $value['template']['value'];
+  form_set_value($element, $value, $form_state);
 }
 
 /**
@@ -203,7 +207,7 @@ function tabletop_field_formatter_view($entity_type, $entity, $field, $instance,
           'class' => array('tabletop-handlebars-template'),
           'type' => 'text/x-handlebars-template',
         ),
-        '#value' => check_markup($item['template']),
+        '#value' => check_markup($item['template'], $item['format'], $langcode),
       );
       
       // Aggregate the tables by spreadsheet key, and associate spreadsheet
