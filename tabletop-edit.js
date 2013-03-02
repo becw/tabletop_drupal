@@ -64,11 +64,12 @@
           // Build default text field value.
           var $template = $('.tabletop-template', field);
           var defaultValue = $template.data('defaultValue');
+
           var newDefaultValue = '{{#each data}}';
           $.each(sheet.column_names, function(i, col) {
-            newDefaultValue += "\r\n  {{" + col + "}}";
+            newDefaultValue += "\n  {{" + col + "}}";
           });
-          newDefaultValue += "\r\n{{/each}}";
+          newDefaultValue += "\n{{/each}}";
 
           // Set default.
           if (!$template.val() || $template.val() == defaultValue) {
