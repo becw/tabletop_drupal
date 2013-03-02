@@ -30,6 +30,40 @@ function tabletop_library() {
 }
 
 /**
+ * Implements hook_filter_info().
+ */
+function tabletop_filter_info() {
+  return array(
+    'no_triple_stash' => array(
+      'title' => 'Tabletop/Handlebars: No triple stash',
+      'description' => 'Prevent users from bypassing HTML-escaping in Handlebars templates by using {{{triple-stash}}} expressions.',
+      'tips callback' => 'tabletop_filter_no_triple_stash_tips',
+      'process callback' => 'tabletop_filter_no_triple_stash_process',
+    ),
+  );
+}
+
+/**
+ * Implements hook_filter_FILTER_tips().
+ */
+function tabletop_filter_no_triple_stash_tips($filter, $format, $long) {
+  if ($long) {
+    return t('"Triple-stash" Handlebars {{{expressions}}} will be transformed to normal, HTML-escaped {{expressions}}.');
+  }
+  else {
+    return t('Handlebars expressions must use {{two}} braces, not {{{three}}}.');
+  }
+}
+
+/**
+ * Implements hook_filter_FILTER_process().
+ */
+function tabletop_filter_no_triple_stash_process($text, $filter, $format, $langcode, $cache, $cache_id) {
+  $text = preg_replace('/\{\{\{(.+?)\}\}\}/', '{{$1}}', $text);
+  return $text;
+}
+
+/**
  * @see field_example.module
  *
  * Providing a field requires:
