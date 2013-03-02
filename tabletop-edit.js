@@ -61,16 +61,12 @@
         var sheet = table.sheets(selected);
         if (sheet) {
           // Set help text.
-          // @todo Fix me.
           $('.tabletop-model-columns', field).html('Your column names are: <code></code>');
           $.each(sheet.column_names, function(i, col) {
             $('.tabletop-model-columns code', field).append('{{' + col + '}} ');
           });
 
           // Build default text field value.
-          var $template = $('.tabletop-template', field);
-          var defaultValue = $template.data('defaultValue');
-
           var newDefaultValue = '{{#each data}}';
           $.each(sheet.column_names, function(i, col) {
             newDefaultValue += "\n  {{" + col + "}}";
@@ -78,6 +74,8 @@
           newDefaultValue += "\n{{/each}}";
 
           // Set default.
+          var $template = $('.tabletop-template', field);
+          var defaultValue = $template.data('defaultValue');
           if (!$template.val() || $template.val() == defaultValue) {
             $template.val(newDefaultValue);
           }
