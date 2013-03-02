@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * @file
+ * 
+ */
+
+/**
+ * Implements hook_field_schema().
+ *
+ * Defines the database schema of the field, using the format used by the
+ * Schema API.
+ */
+function tabletop_field_schema($field) {
+  $columns = array(
+    'key' => array(
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => TRUE,
+    ),
+    'sheet' => array(
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+    ),
+    'template' => array(
+      'type' => 'text',
+    ),
+    'format' => array(
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+    ),
+  );
+  return array(
+    'columns' => $columns,
+    'indexes' => array(
+      'format' => array('format'),
+    ),
+    'foreign keys' => array(
+      'format' => array(
+        'table' => 'filter_format',
+        'columns' => array('format' => 'format'),
+      ),
+    ),
+  );
+}

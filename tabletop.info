@@ -1,0 +1,3 @@
+name = Tabletop
+description = A field that can pull in Google Spreadsheet data using Tabletop.js
+core = 7.x

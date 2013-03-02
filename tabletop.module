@@ -1,0 +1,225 @@
+<?php
+
+/**
+ * @file
+ * 
+ */
+
+/**
+ * Implements hook_library().
+ */
+function tabletop_library() {
+  return array(
+    'tabletop' => array(
+      'title' => 'Tabletop',
+      'website' => 'https://github.com/jsoma/tabletop',
+      'version' => 0,
+      'js' => array(
+        'sites/all/libraries/tabletop/src/tabletop.js' => array(),
+      ),
+    ),
+    'handlebars.js' => array(
+      'title' => 'Handlebars',
+      'website' => 'http://handlebarsjs.com', // @see 'http://github.com/wycats/handlebars.js'
+      'version' => 'v1.0.0-rc3',
+      'js' => array(
+        'sites/all/libraries/handlebars.js' => array(),
+      ),
+    ),
+  );
+}
+
+/**
+ * @see field_example.module
+ *
+ * Providing a field requires:
+ * - Defining a field:
+ *   - hook_field_info()
+ *   - hook_field_schema()
+ *   - hook_field_validate()
+ *   - hook_field_is_empty()
+ *
+ * - Defining a formatter for the field (the portion that outputs the field for
+ *   display):
+ *   - hook_field_formatter_info()
+ *   - hook_field_formatter_view()
+ *
+ * - Defining a widget for the edit form:
+ *   - hook_field_widget_info()
+ *   - hook_field_widget_form()
+ */
+
+/**
+ * Implements hook_field_info().
+ */
+function tabletop_field_info() {
+  return array(
+    'tabletop' => array(
+      'label' => t('Tabletop'),
+      'description' => t('Retrieves and templates data from a Google Spreadsheet.'),
+      'default_widget' => 'tabletop',
+      'default_formatter' => 'tabletop',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_validate().
+ */
+function tabletop_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+  foreach ($items as $delta => $item) {}
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function tabletop_field_is_empty($item, $field) {
+  return empty($item['key']) && empty($item['sheet']) && empty($item['template']);
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function tabletop_field_widget_info() {
+  return array(
+    'tabletop' => array(
+      'label' => t('Tabletop'),
+      'field types' => array('tabletop'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function tabletop_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  if ($instance['widget']['type'] == 'tabletop') {
+    $value = isset($items[$delta]) ? $items[$delta] : array('key' => NULL, 'sheet' => NULL, 'template' => NULL);
+    $element += array(
+      '#type' => 'fieldset',
+      '#element_validate' => array('tabletop_tabletop_widget_validate'),
+      '#delta' => $delta,
+      '#attributes' => array('class' => array('edit-tabletop')),
+      '#attached' => array(
+        'library' => array(
+          array('tabletop', 'tabletop'),
+          array('tabletop', 'handlebars.js'),
+        ),
+        'js' => array(
+          drupal_get_path('module', 'tabletop') . '/tabletop-edit.js',
+          drupal_get_path('module', 'tabletop') . '/tabletop-display.js',
+        ),
+      ),
+    );
+    $element['key'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Key'),
+      '#description' => t('A Google Spreadsheet key or URL.'),
+      '#default_value' => $value['key'],
+      '#attributes' => array('class' => array('tabletop-key')),
+      '#required' => $instance['required'],
+    );
+    $element['sheet'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Sheet name'),
+      '#description' => t('A sheet name from your Google Spreadsheet.'),
+      '#default_value' => $value['sheet'],
+      '#attributes' => array('class' => array('tabletop-sheet', 'js-hide')),
+      '#required' => $instance['required'],
+      '#prefix' => '<div class="tabletop-sheet-select"></div>',
+    );
+    $element['template'] = array(
+      '#type' => 'textarea',
+      '#title' => t('Template'),
+      '#description' => t('A !handlebars template for your data.', array(
+        '!handlebars' => l('Handlebars', 'http://handlebarsjs.com/'),
+      )),
+      '#default_value' => $value['template'],
+      '#attributes' => array('class' => array('tabletop-template')),
+      '#required' => $instance['required'],
+      '#prefix' => '<div class="tabletop-model-columns">To get started, try <code>{{#each data}}</code>.</div>',
+    );
+  }
+
+  return $element;
+}
+
+/**
+ * Field validation.
+ */
+function tabletop_tabletop_widget_validate($element, &$form_state) {
+  // $delta = $element['#delta'];
+  // $field = $form_state['field'][$element['#field_name']][$element['#language']]['field'];
+  // $field_name = $field['field_name'];
+  // $value = isset($form_state['values'][$field_name][$element['#language']][$delta]) ? $form_state['values'][$field_name][$element['#language']][$delta] : NULL;
+  // form_error($element['key'], t('Something is wrong.'));
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function tabletop_field_formatter_info() {
+  return array(
+    'tabletop' => array(
+      'label' => t('Tabletop'),
+      'field types' => array('tabletop'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function tabletop_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  
+  if ($display['type'] == 'tabletop' && !empty($items)) {
+    $element = array(
+      '#attached' => array(
+        'library' => array(
+          array('tabletop', 'tabletop'),
+          array('tabletop', 'handlebars.js'),
+        ),
+        'js' => array(
+          drupal_get_path('module', 'tabletop') . '/tabletop-display.js',
+        ),
+      ),
+    );
+
+    $js_data = array(
+      'tables' => array(),
+      'templates' => array(),
+    );
+    foreach ($items as $delta => $item) {
+      // Generate an HTML id for the template.
+      $id = drupal_html_id("tabletop-{$entity_type}");
+
+      // Output the template in a script tag.
+      $element[$delta] = array(
+        '#type' => 'html_tag',
+        '#tag' => 'script',
+        '#attributes' => array(
+          'id' => $id,
+          'class' => array('tabletop-handlebars-template'),
+          'type' => 'text/x-handlebars-template',
+        ),
+        '#value' => check_markup($item['template']),
+      );
+      
+      // Aggregate the tables by spreadsheet key, and associate spreadsheet
+      // keys with template ids.
+      $js_data['tables'][$item['key']][] = $item['sheet'];
+      $js_data['templates'][$id] = array(
+        'key' => $item['key'],
+        'sheet' => $item['sheet'],
+      );
+    }
+
+    $element['#attached']['js'][] = array(
+      'data' => array('tabletop' => $js_data), 
+      'type' => 'setting',
+    );
+  }
+  
+  return $element;
+}
